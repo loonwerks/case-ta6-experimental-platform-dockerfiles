@@ -5,6 +5,14 @@ docker build --force-rm=true \
 	-t case-ta6-tools:latest \
 	. && \
 docker build --force-rm=true \
+	-f case-ta6-odroid-xu4-tools.dockerfile \
+	-t case-ta6-odroid-xu4-tools:latest \
+	. && \
+docker build --force-rm=true \
+	-f case-ta6-odroid-xu4-build.dockerfile \
+	-t case-ta6-odroid-xu4-build:latest \
+	. && \
+docker build --force-rm=true \
 	-f case-ta6-uxas.dockerfile \
 	-t case-ta6-uxas:latest \
 	. && \
