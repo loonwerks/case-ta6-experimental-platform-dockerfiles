@@ -118,12 +118,23 @@ Finally, Docker attempts to manage network name resolution through DNS
 by filtering out local servers and replacing with with public DNS
 servers.  Again, firewalls and proxy servers will get in the way.
 This can be resolved through a bit of reconfiguration of the name
-resolution.  Please see the Docker Forums article [DNS resolution not
-working in
+resolution.  Please see the Docker Documentation article [Configure
+container
+DNS](https://docs.docker.com/v17.09/engine/userguide/networking/default_network/configure-dns/)
+and Docker Forums article [DNS resolution not working in
 containers](https://forums.docker.com/t/dns-resolution-not-working-in-containers/36246)
-and Stack Overflow article [Docker cannot resolve DNS on private
-network](https://stackoverflow.com/questions/39400886/docker-cannot-resolve-dns-on-private-network)
-for a detailed explanation of how to resolve this issue.
+for a detailed explanation.  To resolve the issue, add the following
+to the /etc/docker/daemon.json file:
+
+~~~~~
+{
+	"dns" : ["127.0.1.1"]
+}
+~~~~~
+
+where the address "127.0.1.1" is replaced with an address of a DNS
+server accessible within your private network.  A comma-separated list
+of servers may be provided if you wish to have some alternate servers.
 
 There are likely Windows equivalents for the steps taken here, but
 this has not yet been explored.
