@@ -61,7 +61,8 @@ Please see the [Docker Community
 Edition](https://www.docker.com/community-edition) page for
 installation instructions for your platform.
 
-Alternatively, Docker CE may be installed using the package management system of many operating systems
+Alternatively, Docker CE may be installed using the package management
+system of many operating systems
 
 + For Ubuntu and derivatives such as Linux Mint, see [Get Docker CE
 for Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/).
@@ -74,6 +75,58 @@ see [How to easily install and uninstall docker on MacOs
 [sic]](https://stackoverflow.com/questions/44346109/how-to-easily-install-and-uninstall-docker-on-macos).
 However, we have not tested it and cannot vouch for it.  Instead,
 downloanding the .DMG from Docker is recommended.
+
+### Notes on Using Docker Behind a Proxy
+
+May users may need to setup and use Docker behind a corporate firewall
+and proxy server system.  There are a few steps to getting Docker
+working in this configuration.  First the Docker service must be
+instructed as to the proxy server.  On Unix-like operating systems
+this is typically done by adding the following entries to the
+/etc/default/docker file:
+
+~~~~~
+export http_proxy="http://proxy.corporate.com:8080/"
+export https_proxy="https://proxy.corporate.com:8080/"
+export HTTP_PROXY="http://proxy.corporate.com:8080/"
+export HTTPS_PROXY="https://proxy.corporate.com:8080/"
+~~~~~
+
+where, of course, the "proxy.corporate.com:9090/" is replaced with the
+approprite network name and port number for your organization.
+
+Next Docker containers must be instructed also to use proxies.  This
+is done on a per-user basis by adding the following to the user
+~/.docker/config.json file:
+
+~~~~~
+{
+  "proxies": {
+    "default": {
+      "httpProxy": "http://proxy.corporate.com:8080/",
+      "httpsProxy": "http://proxy.corporate.com:8080/",
+      "noProxy": "*.corporate.com"
+    }
+  }
+}
+~~~~~
+
+where again the values are replaced with those appropriate for your
+organization.
+
+Finally, Docker attempts to manage network name resolution through DNS
+by filtering out local servers and replacing with with public DNS
+servers.  Again, firewalls and proxy servers will get in the way.
+This can be resolved through a bit of reconfiguration of the name
+resolution.  Please see the Docker Forums article [DNS resolution not
+working in
+containers](https://forums.docker.com/t/dns-resolution-not-working-in-containers/36246)
+and Stack Overflow article [Docker cannot resolve DNS on private
+network](https://stackoverflow.com/questions/39400886/docker-cannot-resolve-dns-on-private-network)
+for a detailed explanation of how to resolve this issue.
+
+There are likely Windows equivalents for the steps taken here, but
+this has not yet been explored.
 
 ## Running the Docker Image
 
