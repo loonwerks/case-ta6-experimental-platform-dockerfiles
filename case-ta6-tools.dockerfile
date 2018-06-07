@@ -15,7 +15,6 @@ RUN sed -i 's/deb.debian.org/httpredir.debian.org/g' /etc/apt/sources.list \
     && apt-get update -q \
     && apt-get install -y --no-install-recommends \
 	libc6:i386 libncurses5:i386 libncurses5-dev:i386 libqt4-dev:i386 libstdc++6:i386 lib32z1 \
-
 	apt-utils \
 	software-properties-common \
 	sudo \
