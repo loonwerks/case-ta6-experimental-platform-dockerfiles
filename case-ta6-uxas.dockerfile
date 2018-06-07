@@ -101,4 +101,5 @@ ENV ARCH=arm
 RUN meson build-armhf --cross-file=cross_file.txt --buildtype=release \
 	&& ninja -C build-armhf all
 
-# CMD ["bash"]
+# Install the UxAS binary to the rootfs
+RUN install build-armhf/uxas /rootfs/usr/bin
