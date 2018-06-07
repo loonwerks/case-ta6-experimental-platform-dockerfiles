@@ -27,9 +27,8 @@ WORKDIR u-boot
 RUN make odroid-xu4_defconfig && make 
 
 # Fetch Linux Kernel and build
-ENV CROSS_COMPILE=arm-linux-gnueabihf-
+ENV CROSS_COMPILE=/toolchains/gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-
 ENV ARCH=arm
-ENV PATH=/toolchains/gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf/bin/:${PATH}
 WORKDIR /git
 RUN git config --global http.postBuffer 2147463648
 RUN git config --global https.postBuffer 2147483648
