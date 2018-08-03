@@ -1,12 +1,11 @@
 #! /bin/bash
 #
 
-#docker_image=case-ta6-uxas:latest
-docker_image=case-ta6-odroid-xu4-build-4.14:latest
+docker_image=case-ta6-uxas
 
 function zeroize_sd() {
     echo "zeroizing sd card"
-    sudo dd if=/dev/zero of=${1} bs=1M count=2048
+    sudo dd if=/dev/zero of=${1} bs=1M count=512 status=progress
 }
 
 function mount_sd() {
@@ -69,7 +68,36 @@ function install_bootfs() {
 
 function install_rootfs() {
     echo "rootfs installing"
-    docker run --rm $docker_image tar Ccpf /rootfs - . | sudo tar Cxpf rootfs -
+    # docker run --rm $docker_image tar Ccpf /rootfs - . | sudo tar Cxpf rootfs -
+    docker run --rm --privileged $docker_image bash -c "mkdir -p /mnt/rootfs && mount /ubuntu-image/1.img /mnt/rootfs && tar Ccpf /mnt/rootfs - ." | sudo tar Cxpf rootfs -    
+}
+
+function add_accounts() {
+    sudo cp /usr/bin/qemu-arm-static rootfs/usr/bin
+    echo 'adduser --disabled-password --gecos "" uxas && addgroup uxas adm && addgroup uxas sudo && echo "uxas:uxas" | chpasswd' | sudo tee -a rootfs/adduser_uxas.sh > /dev/null
+    for m in `echo 'sys dev proc'`; do sudo mount /$m rootfs/$m -o bind; done
+    sudo LC_ALL=C chroot rootfs bash /adduser_uxas.sh
+    for m in `echo 'sys dev proc'`; do sudo umount rootfs/$m; done
+    sudo rm rootfs/usr/bin/qemu-arm-static
+    sudo rm rootfs/adduser_uxas.sh
+}
+
+function install_uxas() {
+    sudo cp /usr/bin/qemu-arm-static rootfs/usr/bin
+    echo 'apt-get update -y -q && apt-get install -y -q libglu1-mesa:armhf libglu1-mesa-dev:armhf' | sudo tee -a rootfs/install_libglu1.sh > /dev/null
+    for m in `echo 'sys dev proc'`; do sudo mount /$m rootfs/$m -o bind; done
+    sudo LC_ALL=C chroot rootfs bash /install_libglu1.sh
+    for m in `echo 'sys dev proc'`; do sudo umount rootfs/$m; done
+    sudo rm rootfs/usr/bin/qemu-arm-static
+    sudo rm rootfs/install_libglu1.sh
+    sudo mkdir rootfs/home/uxas/build
+    docker run --rm $docker_image cat /git/OpenUxAS/build-armhf/uxas | sudo tee -a rootfs/home/uxas/build/uxas > /dev/null
+    sudo chown -R 1000 rootfs/home/uxas/build
+    sudo chgrp -R 1000 rootfs/home/uxas/build
+    sudo chmod +x rootfs/home/uxas/build/uxas
+    docker run --rm $docker_image tar Ccf /git/OpenUxAS - examples | sudo tar Cxf rootfs/home/uxas -
+    sudo chown -R 1000 rootfs/home/uxas/examples
+    sudo chgrp -R 1000 rootfs/home/uxas/examples
 }
 
 set -x
@@ -87,4 +115,6 @@ format_partitions $1 e15b93a3-d43c-4e1a-a847-c96fa32cc6e7
 mount_sd $1
 install_bootfs $1
 install_rootfs $1
+add_accounts $1
+install_uxas
 umount_sd $1

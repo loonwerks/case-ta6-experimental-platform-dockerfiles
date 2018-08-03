@@ -12,11 +12,26 @@ FROM case-ta6-odroid-xu4-tools:latest
 RUN apt-get install -y -q \
     lib32stdc++6 lib32z1 lzop u-boot-tools \
     build-essential gcc \
-    libncurses5-dev libssl-dev
+    libncurses5-dev libssl-dev \
+    initramfs-tools \
+    p7zip-full
+
+# Fetch prebuilt Linux filesystem image and extract bootfs
+WORKDIR /ubuntu-image
+RUN wget https://odroid.in/ubuntu_16.04lts/ubuntu-16.04.3-4.14-minimal-odroid-xu4-20171213.img.xz
+RUN xz -d ubuntu-16.04.3-4.14-minimal-odroid-xu4-20171213.img.xz
+RUN 7z x ubuntu-16.04.3-4.14-minimal-odroid-xu4-20171213.img
+WORKDIR /bootfs
+RUN 7z x /ubuntu-image/0.fat
 
 # Fetch prebuilt Linux rootfs
-WORKDIR /rootfs
-RUN curl http://cdimage.ubuntu.com/ubuntu-base/releases/16.04/release/ubuntu-base-16.04-core-armhf.tar.gz | tar xpz
+# Unfortunately, cannot mount inside a docker build and thus cannot
+# extract the rootfs in the image just downloaded.  So, download it
+# again...
+# WORKDIR /rootfs
+# RUN curl http://cdimage.ubuntu.com/ubuntu-base/releases/16.04/release/ubuntu-base-16.04.3-base-armhf.tar.gz | tar xpz
+
+#######
 
 # Fetch U-Boot and build
 ENV CROSS_COMPILE=/toolchains/gcc-linaro-arm-linux-gnueabihf-4.9-2014.09_linux/bin/arm-linux-gnueabihf-
@@ -27,38 +42,35 @@ WORKDIR u-boot
 RUN make odroid-xu4_defconfig && make 
 
 # Fetch Linux Kernel and build
-ENV CROSS_COMPILE=/toolchains/gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-
-ENV ARCH=arm
-WORKDIR /git
-RUN git config --global http.postBuffer 2147463648
-RUN git config --global https.postBuffer 2147483648
-ENV GIT_CURL_VERBOSE=1
-RUN git clone --depth 1 https://github.com/hardkernel/linux.git -b odroidxu4-4.14.y odroidxu4-4.14.y
-WORKDIR odroidxu4-4.14.y
-RUN make odroidxu4_defconfig && make -j4
+# ENV CROSS_COMPILE=/toolchains/gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-
+# ENV ARCH=arm
+# WORKDIR /git
+# RUN git config --global http.postBuffer 2147463648
+# RUN git config --global https.postBuffer 2147483648
+# ENV GIT_CURL_VERBOSE=1
+# RUN git clone --depth 1 https://github.com/hardkernel/linux.git -b odroidxu4-4.14.y odroidxu4-4.14.y
+# WORKDIR odroidxu4-4.14.y
+# RUN make odroidxu4_defconfig && make -j4
 
 # Construct the Linux bootfs
-RUN mkdir /bootfs
-RUN cp arch/arm/boot/zImage /bootfs
-RUN cp arch/arm/boot/dts/*odroidxu*.dtb /bootfs
-RUN cp .config /bootfs/config
-RUN make kernelrelease >> /bootfs/kernelrelease.txt
+# RUN mkdir /bootfs
+# RUN cp arch/arm/boot/zImage /bootfs
+# RUN cp arch/arm/boot/dts/*odroidxu*.dtb /bootfs
+# RUN cp .config /bootfs/config
+# RUN make kernelrelease >> /bootfs/kernelrelease.txt
 
 # Install the kernel modules and headers in the rootfs
-RUN make ARCH=arm INSTALL_MOD_PATH=/rootfs modules_install
-RUN make INSTALL_HDR_PATH=/rootfs/usr headers_install
-
-####### Move me!!! ###########
-RUN apt-get install -y -q initramfs-tools
+# RUN make ARCH=arm INSTALL_MOD_PATH=/rootfs modules_install
+# RUN make INSTALL_HDR_PATH=/rootfs/usr headers_install
 
 # Create boot RAM filesystem
-WORKDIR /rootfs/boot
-RUN cp /bootfs/config config-`cat /bootfs/kernelrelease.txt`
+# WORKDIR /rootfs/boot
+# RUN cp /bootfs/config config-`cat /bootfs/kernelrelease.txt`
 # Note: this does not yet work because it cannot grab the necessary
 # because its not done in a chroot (which docker doesn't support)
-RUN mkinitramfs -o initrd.img-`cat /bootfs/kernelrelease.txt` `cat /bootfs/kernelrelease.txt`
-RUN mkimage -A arm -O linux -T ramdisk -a 0x0 -e 0x0 -n initrd.img-`cat /bootfs/kernelrelease.txt` -d initrd.img-`cat /bootfs/kernelrelease.txt` uInitrd-`cat /bootfs/kernelrelease.txt`
-RUN cp uInitrd-`cat /bootfs/kernelrelease.txt` /bootfs/uInitrd
+# RUN mkinitramfs -o initrd.img-`cat /bootfs/kernelrelease.txt` `cat /bootfs/kernelrelease.txt`
+# RUN mkimage -A arm -O linux -T ramdisk -a 0x0 -e 0x0 -n initrd.img-`cat /bootfs/kernelrelease.txt` -d initrd.img-`cat /bootfs/kernelrelease.txt` uInitrd-`cat /bootfs/kernelrelease.txt`
+# RUN cp uInitrd-`cat /bootfs/kernelrelease.txt` /bootfs/uInitrd
 
 # Create initial boot script
 WORKDIR /bootfs
@@ -120,7 +132,7 @@ setenv HPD "true"\n\
 '#'------------------------------------------------------------------------------------------------------\n\
 '#' Basic Ubuntu Setup. Don'"'"'t touch unless you know what you are doing.\n\
 '#' --------------------------------\n\
-setenv bootrootfs "console=tty1 console=ttySAC2,115200n8 root=UUID=e15b93a3-d43c-4e1a-a847-c96fa32cc6e7 rootwait ro fsck.repair=yes net.ifnames=0"\n\
+setenv bootrootfs "console=tty1 console=ttySAC2,115200n8 root=UUID=e15b93a3-d43c-4e1a-a847-c96fa32cc6e7 rootwait rw fsck.repair=yes net.ifnames=0"\n\
 \n\
 \n\
 '#' Load kernel, initrd and dtb in that sequence\n\
