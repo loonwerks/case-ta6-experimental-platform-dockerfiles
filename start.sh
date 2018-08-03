@@ -26,5 +26,5 @@ docker run \
 	--hostname in-container \
 	--rm \
 	-v $PWD:/host \
-	case-ta6-uxas bash
+	case-ta6-uxas-build bash
 
