@@ -1,7 +1,7 @@
 #! /bin/bash
 #
 
-docker_image=case-ta6-uxas
+docker_image=case-ta6-uxas-build
 
 function zeroize_sd() {
     echo "zeroizing sd card"
