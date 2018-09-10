@@ -72,23 +72,33 @@ function install_rootfs() {
     docker run --rm --privileged $docker_image bash -c "mkdir -p /mnt/rootfs && mount /ubuntu-image/1.img /mnt/rootfs && tar Ccpf /mnt/rootfs - ." | sudo tar Cxpf rootfs -    
 }
 
-function add_accounts() {
+function setup_chroot() {
     sudo cp /usr/bin/qemu-arm-static rootfs/usr/bin
-    echo 'adduser --disabled-password --gecos "" uxas && addgroup uxas adm && addgroup uxas sudo && echo "uxas:uxas" | chpasswd' | sudo tee -a rootfs/adduser_uxas.sh > /dev/null
     for m in `echo 'sys dev proc'`; do sudo mount /$m rootfs/$m -o bind; done
-    sudo LC_ALL=C chroot rootfs bash /adduser_uxas.sh
+}
+
+function unsetup_chroot() {
     for m in `echo 'sys dev proc'`; do sudo umount rootfs/$m; done
     sudo rm rootfs/usr/bin/qemu-arm-static
+}
+
+function setup_wifi() {
+    sudo sed -i -e '/\t\t\trm -fr \/\.first_boot/a\' -e '\t\t\t[ ! -f \/etc\/NetworkManager\/system-connections\/wifi-wlan0 ] && nmcli connection add ifname wlan0 autoconnect yes save yes type wifi ssid CASE-UxAS-Net && nmcli connection modify wifi-wlan0 wifi-sec.key-mgmt wpa-psk wifi-sec.psk CASE-UxAS-Raze-is-Cool' rootfs/aafirstboot
+}
+
+function add_accounts() {
+    echo 'adduser --disabled-password --gecos "" uxas && addgroup uxas adm && addgroup uxas sudo && echo "uxas:uxas" | chpasswd' | sudo tee -a rootfs/adduser_uxas.sh > /dev/null
+    setup_chroot
+    sudo LC_ALL=C chroot rootfs bash /adduser_uxas.sh
+    unsetup_chroot
     sudo rm rootfs/adduser_uxas.sh
 }
 
 function install_uxas() {
-    sudo cp /usr/bin/qemu-arm-static rootfs/usr/bin
+    setup_chroot
     echo 'apt-get update -y -q && apt-get install -y -q libglu1-mesa:armhf libglu1-mesa-dev:armhf' | sudo tee -a rootfs/install_libglu1.sh > /dev/null
-    for m in `echo 'sys dev proc'`; do sudo mount /$m rootfs/$m -o bind; done
     sudo LC_ALL=C chroot rootfs bash /install_libglu1.sh
-    for m in `echo 'sys dev proc'`; do sudo umount rootfs/$m; done
-    sudo rm rootfs/usr/bin/qemu-arm-static
+    unsetup_chroot
     sudo rm rootfs/install_libglu1.sh
     sudo mkdir rootfs/home/uxas/build
     docker run --rm $docker_image cat /git/OpenUxAS/build-armhf/uxas | sudo tee -a rootfs/home/uxas/build/uxas > /dev/null
@@ -115,6 +125,7 @@ format_partitions $1 e15b93a3-d43c-4e1a-a847-c96fa32cc6e7
 mount_sd $1
 install_bootfs $1
 install_rootfs $1
+setup_wifi
 add_accounts $1
 install_uxas
 umount_sd $1
