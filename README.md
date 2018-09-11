@@ -139,8 +139,62 @@ of servers may be provided if you wish to have some alternate servers.
 There are likely Windows equivalents for the steps taken here, but
 this has not yet been explored.
 
-## Running the Docker Image
+## Running the Docker Images
 
 In Docker nomenclature a running instance of an image is called a
-"container." {*TO DO: complete this section.*}
+"container."  The .dockerfiles in this repository build a collection of
+images that collect tools and dependencies and support building the OpenUxAS
+for the CASE TA-6 Experimental Platform.  Once the docker images are built,
+they can be run as a container producing a shell in which UxAS can be built.
+
+The ideas behind how this is put together with .dockerfiles and a Makefile is
+based on a [similar project](https://github.com/SEL4PROJ/seL4-CAmkES-L4v-dockerfiles)
+created by the [Trustworthy Systems](https://ts.data61.csiro.au/projects/TS/)
+group to access a common build environment for seL4, CAmkES and L4v.  Thanks!
+
+### Quick Start
+
+To sequentially build the docker images and start a shell in which UxAS
+can be built, run:
+
+~~~
+git clone https://eisgit.rockwellcollins.com/case-ta6/experimental-platform-docker-images.git
+cd experimental-platform-docker-images
+make user
+~~~
+
+A location for the top of the UxAS source code tree can also be specified by:
+
+~~~
+make user HOST_DIR=/scratch/uxas_stuff
+~~~
+
+### More Lengthy Description of Startup Details
+
+TODO
+
+### Example of fetching and building UxAS
+
+First open the build as described above.
+
+To build UxAS its source code must first be retrieved.  A fork of the [OpenUxAS](https://github.com/afrl-rq/OpenUxAS) software repository
+containing necessary additions and examples for the CASE TA-6 experimental
+platform exists [here](https://eisgit.rockwellcollins.com/case-ta6/OpenUxAS).
+
+~~~
+git clone https://github.com/afrl-rq/LmcpGen.git
+git clone -b develop-case-ta6 https://eisgit.rockwellcollins.com/case-ta6/OpenUxAS.git
+~~~
+
+The follow the build instructions for OpenUxAS as follows:
+
+~~~
+cd LmcpGen
+ant jar
+cd ../OpenUxAS
+./RunLmcpGen.sh
+./prepare
+meson build-armhf --cross-file=arm-linux-gnueabihf-cross-file.txt --buildtype=release
+ninja -C build-armhf all
+~~~
 
