@@ -1,6 +1,8 @@
 #! /bin/bash
 #
 
+HOST=${HOST:-.}
+
 docker_image=case-ta6-uxas-build
 
 function zeroize_sd() {
@@ -101,11 +103,13 @@ function install_uxas() {
     unsetup_chroot
     sudo rm rootfs/install_libglu1.sh
     sudo mkdir rootfs/home/uxas/build
-    docker run --rm $docker_image cat /git/OpenUxAS/build-armhf/uxas | sudo tee -a rootfs/home/uxas/build/uxas > /dev/null
+    # docker run --rm $docker_image cat /git/OpenUxAS/build-armhf/uxas | sudo tee -a rootfs/home/uxas/build/uxas > /dev/null
+    sudo cp ${HOST}/OpenUxAS/build-armhf/uxas rootfs/home/uxas/build/uxas
     sudo chown -R 1000 rootfs/home/uxas/build
     sudo chgrp -R 1000 rootfs/home/uxas/build
     sudo chmod +x rootfs/home/uxas/build/uxas
-    docker run --rm $docker_image tar Ccf /git/OpenUxAS - examples | sudo tar Cxf rootfs/home/uxas -
+    # docker run --rm $docker_image tar Ccf /git/OpenUxAS - examples | sudo tar Cxf rootfs/home/uxas -
+    sudo cp -R ${HOST}/OpenUxAS/examples rootfs/home/uxas
     sudo chown -R 1000 rootfs/home/uxas/examples
     sudo chgrp -R 1000 rootfs/home/uxas/examples
 }

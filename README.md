@@ -198,3 +198,14 @@ meson build-armhf --cross-file=arm-linux-gnueabihf-cross-file.txt --buildtype=re
 ninja -C build-armhf all
 ~~~
 
+## Fusing the build onto a MicroSD Card
+
+Ideally, this is as simple as running (assuming you have a bash shell):
+
+~~~
+./build-sd-card.sh <dev>
+~~~
+
+where $dev$ is the device file for the raw MicroSD card (e.g. /dev/sdc).
+
+
