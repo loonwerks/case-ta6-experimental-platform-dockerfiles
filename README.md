@@ -173,7 +173,7 @@ make user HOST_DIR=/scratch/uxas_stuff
 
 TODO
 
-### Example of fetching and building UxAS
+### Example of Fetching and Building UxAS
 
 First open the build as described above.
 
@@ -198,7 +198,7 @@ meson build-armhf --cross-file=arm-linux-gnueabihf-cross-file.txt --buildtype=re
 ninja -C build-armhf all
 ~~~
 
-## Fusing the build onto a MicroSD Card
+## Fusing the Build onto a MicroSD Card
 
 Ideally, this is as simple as running (assuming you have a bash shell):
 
@@ -206,6 +206,20 @@ Ideally, this is as simple as running (assuming you have a bash shell):
 ./build-sd-card.sh <dev>
 ~~~
 
-where $dev$ is the device file for the raw MicroSD card (e.g. /dev/sdc).
+where `<dev>` is the device file for the raw MicroSD card (e.g. /dev/sdc).
+This script erases, partitions and formats the MicroSD card, gathers the
+various elements of software including the bootloader, device tree,
+boot filesystem and root filesystem, UxAS application and example
+configuration files and fuses these onto the MicroSD card.
 
+In future, we hope to have a script working in a platform independent
+manner under the Docker-based build system that constructs a whole-disk
+image file.  This file would then support using fusing tools for for
+various host development platforms.
 
+## To Do
+
+1. Add Google 'repo' manifest to gather the various pieces of software
+   (e.g. OpenUxAS, LmcpGen, etc.).
+2. Add a top-level build script, likely in 'ant' with at least incremental
+   and rebuild targets.
