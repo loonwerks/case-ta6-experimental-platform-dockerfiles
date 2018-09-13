@@ -15,7 +15,7 @@ DOCKER_FLAGS ?= --force-rm=true
 
 
 ################################################
-# Build dependencies for sel4/camkes/l4v
+# Build dependencies for Linux and OpenUxAS
 #################################################
 .PHONY: base_tools rebuild_base_tools
 base_tools:
