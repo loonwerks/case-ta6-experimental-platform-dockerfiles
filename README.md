@@ -158,8 +158,8 @@ To sequentially build the docker images and start a shell in which UxAS
 can be built, run:
 
 ~~~
-git clone https://eisgit.rockwellcollins.com/case-ta6/experimental-platform-docker-images.git
-cd experimental-platform-docker-images
+git clone https://github.com/loonwerks/case-ta6-experimental-platform-dockerfiles.git
+cd case-ta6-experimental-platform-dockerfiles
 make user
 ~~~
 
@@ -179,11 +179,11 @@ First open the build as described above.
 
 To build UxAS its source code must first be retrieved.  A fork of the [OpenUxAS](https://github.com/afrl-rq/OpenUxAS) software repository
 containing necessary additions and examples for the CASE TA-6 experimental
-platform exists [here](https://eisgit.rockwellcollins.com/case-ta6/OpenUxAS).
+platform exists [here](https://github.com/loonwerks/case-ta6-experimental-platform-OpenUxAS).
 
 ~~~
 git clone https://github.com/afrl-rq/LmcpGen.git
-git clone -b develop-case-ta6 https://eisgit.rockwellcollins.com/case-ta6/OpenUxAS.git
+git clone -b develop-case-ta6 https://github.com/loonwerks/case-ta6-experimental-platform-OpenUxAS.git
 ~~~
 
 The follow the build instructions for OpenUxAS as follows:

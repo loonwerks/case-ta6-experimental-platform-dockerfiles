@@ -8,17 +8,12 @@
 
 FROM case-ta6-uxas-tools:latest
 
-# Add CA-certificates for Rockwell Collins
-ADD RockwellCollins/Rockwell_Collins_Issuing_CA2_G2.crt /usr/local/share/ca-certificates/RockwellCollins/Rockwell_Collins_Issuing_CA2_G2.crt
-ADD RockwellCollins/Rockwell_Collins_Root_CA_G2.crt /usr/local/share/ca-certificates/RockwellCollins/Rockwell_Collins_Root_CA_G2.crt
-RUN update-ca-certificates
-
 # Set the working directory to /git
 WORKDIR /git
 
 # 'git' the source code for OpenUxAS
 # RUN ["git", "clone", "https://github.com/afrl-rq/OpenUxAS.git"]
-RUN ["git", "clone", "-b", "develop-case-ta6", "https://eisgit.rockwellcollins.com/case-ta6/OpenUxAS.git"]
+RUN ["git", "clone", "-b", "develop-case-ta6", "https://github.com/loonwerks/case-ta6-experimental-platform-OpenUxAS.git" "OpenUxAS"]
 
 # 'git' the source code for LcmpGen
 RUN ["git", "clone", "https://github.com/afrl-rq/LmcpGen.git"]

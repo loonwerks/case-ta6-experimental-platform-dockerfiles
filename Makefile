@@ -1,4 +1,4 @@
-DOCKERHUB ?= eisgit.rockwellcollins.com:4567/case-ta6/experimental-platform-docker-images/
+DOCKERHUB ?= 
 PREFIX ?= case-ta6-
 BASE_TOOLS_IMG ?= $(PREFIX)tools:1.1.0
 ODROID_XU4_TOOLS_IMG ?= $(PREFIX)odroid-xu4-tools:1.1.0
