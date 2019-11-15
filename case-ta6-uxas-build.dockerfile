@@ -13,7 +13,7 @@ WORKDIR /git
 
 # 'git' the source code for OpenUxAS
 # RUN ["git", "clone", "https://github.com/afrl-rq/OpenUxAS.git"]
-RUN ["git", "clone", "-b", "develop-case-ta6", "https://github.com/loonwerks/case-ta6-experimental-platform-OpenUxAS.git" "OpenUxAS"]
+RUN ["git", "clone", "-b", "ph2-platform-assessment-1", "https://github.com/loonwerks/case-ta6-experimental-platform-OpenUxAS.git" "OpenUxAS"]
 
 # 'git' the source code for LcmpGen
 RUN ["git", "clone", "https://github.com/afrl-rq/LmcpGen.git"]
