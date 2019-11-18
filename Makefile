@@ -1,10 +1,12 @@
 DOCKERHUB ?= 
 PREFIX ?= case-ta6-
-DOCKER_TAG ?= p2pa1
+DOCKER_TAG ?= 1.1.0
+UXAS_BRANCH ?= develop-case-ta6
 BASE_TOOLS_IMG ?= $(PREFIX)tools:$(DOCKER_TAG)
 ODROID_XU4_TOOLS_IMG ?= $(PREFIX)odroid-xu4-tools:$(DOCKER_TAG)
 ODROID_XU4_BUILD_IMG ?= $(PREFIX)odroid-xu4-build:$(DOCKER_TAG)
 UXAS_TOOLS_IMG ?= $(PREFIX)uxas-tools:$(DOCKER_TAG)
+UXAS_BUILD_IMG ?= $(PREFIX)uxas-build:$(DOCKER_TAG)
 UXAS_TEST_IMG ?= $(PREFIX)uxas-build:$(DOCKER_TAG)
 EXTRAS_IMG := $(PREFIX)extras
 USER_IMG := $(PREFIX)user-img
@@ -58,11 +60,22 @@ uxas_tools: odroid_xu4_build
 rebuild_uxas_tools: DOCKER_FLAGS += --no-cache
 rebuild_uxas_tools: uxas_tools
 
+.PHONY: uxas_build rebuild_uxas_build
+uxas_build: uxas_tools
+	$(DOCKER_BUILD) $(DOCKER_FLAGS) \
+		--build-arg UXAS_BRANCH=$(UXAS_BRANCH) \
+		--build-arg BASE_IMG=$(UXAS_TOOLS_IMG) \
+		-f case-ta6-uxas-build.dockerfile \
+		-t $(DOCKERHUB)$(UXAS_BUILD_IMG) \
+		.
+rebuild_uxas_build: DOCKER_FLAGS += --no-cache
+rebuild_uxas_build: uxas_build
+
 .PHONY: all
-all: base_tools odroid_xu4_tools odroid_xu4_build uxas_tools
+all: base_tools odroid_xu4_tools odroid_xu4_build uxas_tools uxas_build
 
 .PHONY: rebuild_all
-rebuild_all: rebuild_base_tools rebuild_odroid_xu4_tools rebuild_odroid_xu4_build rebuild_uxas_tools
+rebuild_all: rebuild_base_tools rebuild_odroid_xu4_tools rebuild_odroid_xu4_build rebuild_uxas_tools rebuild_uxas_build
 
 
 ################################################

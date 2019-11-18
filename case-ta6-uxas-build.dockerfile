@@ -9,12 +9,15 @@
 ARG BASE_IMG=case-ta6-uxas-tools
 FROM $BASE_IMG
 
+ARG UXAS_BRANCH=develop-case-ta6
+
 # Set the working directory to /git
 WORKDIR /git
 
 # 'git' the source code for OpenUxAS
 # RUN ["git", "clone", "https://github.com/afrl-rq/OpenUxAS.git"]
-RUN ["git", "clone", "-b", "develop-case-ta6", "https://github.com/loonwerks/case-ta6-experimental-platform-OpenUxAS.git" "OpenUxAS"]
+# RUN ["git", "clone", "-b", "$UXAS_BRANCH", "https://github.com/loonwerks/case-ta6-experimental-platform-OpenUxAS.git", "OpenUxAS"]
+RUN git clone -b $UXAS_BRANCH https://github.com/loonwerks/case-ta6-experimental-platform-OpenUxAS.git OpenUxAS
 
 # 'git' the source code for LcmpGen
 RUN ["git", "clone", "https://github.com/afrl-rq/LmcpGen.git"]
