@@ -6,7 +6,8 @@
 # are streamlined sacrificing flexibility for simplicity in building a single
 # environment that can more easily be managed.
 
-FROM case-ta6-odroid-xu4-build:latest
+ARG BASE_IMG=case-ta6-odroid-xu4-build
+FROM $BASE_IMG
 
 # Necessary because we cannot avoid apt updates in the FROM image
 RUN apt-get update -y -q
@@ -30,15 +31,7 @@ RUN pip3 install ninja
 RUN pip3 install meson==0.42.1
 RUN pip3 install matplotlib pandas
 RUN apt-get install -y -q software-properties-common
-# RUN add-apt-repository -y ppa:webupd8team/java
-RUN add-apt-repository -y "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main"
-RUN apt-get update -y -q
-RUN echo debconf shared/accepted-oracle-license-v1-1 select true | \
-	sudo debconf-set-selections
-RUN echo debconf shared/accepted-oracle-license-v1-1 seen true | \
-	sudo debconf-set-selections
-RUN apt-get install -y -q --allow-unauthenticated oracle-java8-installer
-RUN apt-get install -y -q oracle-java8-set-default
+RUN apt-get install -y -q openjdk-8-jre openjdk-8-jdk
 RUN apt-get install -y -q ant
 
 # Inject standard cross-build environment

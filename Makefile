@@ -1,10 +1,11 @@
 DOCKERHUB ?= 
 PREFIX ?= case-ta6-
-BASE_TOOLS_IMG ?= $(PREFIX)tools:1.1.0
-ODROID_XU4_TOOLS_IMG ?= $(PREFIX)odroid-xu4-tools:1.1.0
-ODROID_XU4_BUILD_IMG ?= $(PREFIX)odroid-xu4-build:1.1.0
-UXAS_TOOLS_IMG ?= $(PREFIX)uxas-tools:1.1.0
-UXAS_TEST_IMG ?= $(PREFIX)uxas-build:1.1.0
+DOCKER_TAG ?= p2pa1
+BASE_TOOLS_IMG ?= $(PREFIX)tools:$(DOCKER_TAG)
+ODROID_XU4_TOOLS_IMG ?= $(PREFIX)odroid-xu4-tools:$(DOCKER_TAG)
+ODROID_XU4_BUILD_IMG ?= $(PREFIX)odroid-xu4-build:$(DOCKER_TAG)
+UXAS_TOOLS_IMG ?= $(PREFIX)uxas-tools:$(DOCKER_TAG)
+UXAS_TEST_IMG ?= $(PREFIX)uxas-build:$(DOCKER_TAG)
 EXTRAS_IMG := $(PREFIX)extras
 USER_IMG := $(PREFIX)user-img
 USER_BASE_IMG := $(UXAS_TOOLS_IMG)

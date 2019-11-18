@@ -6,7 +6,8 @@
 # are streamlined sacrificing flexibility for simplicity in building a single
 # environment that can more easily be managed.
 
-FROM case-ta6-tools:latest
+ARG BASE_IMG=case-ta6-tools
+FROM $BASE_IMG
 
 # Install downloaders
 RUN apt-get install -y -q curl wget

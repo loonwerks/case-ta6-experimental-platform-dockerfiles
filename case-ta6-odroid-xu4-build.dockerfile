@@ -6,7 +6,8 @@
 # are streamlined sacrificing flexibility for simplicity in building a single
 # environment that can more easily be managed.
 
-FROM case-ta6-odroid-xu4-tools:latest
+ARG BASE_IMG=case-ta6-odroid-xu4-tools
+FROM $BASE_IMG
 
 # Fetch all build dependencies
 RUN apt-get install -y -q \

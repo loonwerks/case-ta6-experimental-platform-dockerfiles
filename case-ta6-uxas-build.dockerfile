@@ -6,7 +6,8 @@
 # are streamlined sacrificing flexibility for simplicity in building a single
 # environment that can more easily be managed.
 
-FROM case-ta6-uxas-tools:latest
+ARG BASE_IMG=case-ta6-uxas-tools
+FROM $BASE_IMG
 
 # Set the working directory to /git
 WORKDIR /git
